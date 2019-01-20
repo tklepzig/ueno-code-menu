@@ -43,35 +43,28 @@ export function activate(context: vscode.ExtensionContext) {
             let styleType;
             const nameInput = await vscode.window.showInputBox({ prompt: 'What is the name of the component?' });
             const name = _.deburr(nameInput);
-            // Ask for platform
-            const platform = await vscode.window.showQuickPick(['React', 'React Native'], {
-                placeHolder: 'What platform?',
-            });
             // Which type
             const componentType = await vscode.window.showQuickPick(['PureComponent', 'Component'], {
                 placeHolder: 'Which component type?',
             });
 
-            if (platform === 'React') {
-                styleType = await vscode.window.showQuickPick(styleTypes.map(type => type.name), {
-                    placeHolder: 'What kind of style?',
-                });
-                styleType = styleTypes.find(type => type.name === styleType);
-            }
+            styleType = await vscode.window.showQuickPick(styleTypes.map(type => type.name), {
+                placeHolder: 'What kind of style?',
+            });
+            styleType = styleTypes.find(type => type.name === styleType);
 
             // Create camel case type of component
             const props = {
                 name,
                 nameKebabCase: _.kebabCase(name),
-                nameCamelCase: _.upperFirst(_.camelCase(name)),
+                namePascalCase: _.upperFirst(_.camelCase(name)),
                 nameSnakeCase: _.snakeCase(name),
-                platform: _.kebabCase(platform),
                 componentType,
                 stylesExtension: styleType ? styleType.ext : null,
             };
 
             // Get a directory tree of the template
-            const treeRoot = dirTree(path.resolve(__dirname, 'templates', props.platform));
+            const treeRoot = dirTree(path.resolve(__dirname, 'templates', "react"));
             const depth = [];
 
             const replaceFileName = (input, ext = '') => {
@@ -91,7 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
                     const { name, size, type, children, extension } = file;
                     const newName = replaceFileName(name, extension);
                     if (!newName) return;
-                    
+
                     if (type === 'directory') {
                         // Create new directory
                         depth.push(newName);

@@ -1,0 +1,1 @@
+export { <%= namePascalCase %> } from './<%= namePascalCase %>';
